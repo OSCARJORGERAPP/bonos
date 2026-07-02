@@ -104,7 +104,7 @@ Fuente de verdad del estado del proyecto. Estado real verificado a fecha 2026-07
 | Seed de datos (`scripts/seed.ts`) | Emisores, bonos, carteras de ejemplo (RF-10) | ✅ `npm run seed` |
 | `.env.example` | Plantilla de variables de entorno | ✅ |
 | Lockfile (`package-lock.json`) | Dependencias bloqueadas, commiteado | ✅ |
-| Pipeline CI (`.gitlab-ci.yml`) | Templates de la academia; `build` en runner `cloudrun` | 🟡 pendiente validar en el primer push |
+| Pipeline CI (`.gitlab-ci.yml`) | Templates de la academia; `build` en runner `cloudrun` | ✅ verde (pipeline #1463, 73s) |
 | Diagrama de arquitectura | En README (Mermaid): componentes y flujos | ✅ |
 | Sección de métricas | Instrumentación `timed()` en BD + log estructurado por operación | 🟡 sin prueba de carga |
 | Guía de deployment público | Detallada, reproducible, con secretos y rollback | ⬜ TODO (§9: plataforma sin definir) |
