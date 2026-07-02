@@ -1,0 +1,33 @@
+# Templates de plataforma (modelo opt-in): los stages (provision, build, deploy)
+# vienen de los templates. Esta app usa MongoDB + bucket RustFS (sin Postgres).
+# Configuración replicada del proyecto videocapture (pipeline en verde):
+# ver AGENTS.md §CI y RETROSPECTIVA de videocapture §7-§9.
+include:
+  - project: 'internos/templates-cicd'
+    ref: main
+    file:
+      - 'templates/provision-mongo.yml'
+      - 'templates/provision-rustfs.yml'
+      - 'templates/build-deploy.yml'
+
+# Hoy solo hay un runner online (tag `cloudrun`, executor shell): los jobs de
+# provisión/deploy (sin ese tag, y que además asumen imagen Alpine con `apk`)
+# son incompatibles con esa infraestructura — se quedan en pending o fallan en
+# su primer paso. `allow_failure` dejaría el pipeline en "passed with warnings",
+# así que se desactivan por completo: PROMPT.md §9 solo exige CI en verde
+# cubriendo el build, no el despliegue automatizado.
+wake_cloudrun_runners:
+  rules:
+    - when: never
+
+provision_mongo:
+  rules:
+    - when: never
+
+provision_rustfs:
+  rules:
+    - when: never
+
+deploy:
+  rules:
+    - when: never

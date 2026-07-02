@@ -1,36 +1,51 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 💰 Gestión de Bonos Corporativos
 
-## Getting Started
+Aplicación fintech de deuda corporativa con **Next.js 16 + MongoDB**: el admin estructura emisiones de bonos y gestiona el bookbuilding; el inversor explora el screener, compra y sigue su cartera.
 
-First, run the development server:
+- **Especificación (QUÉ)**: [PROMPT.md](PROMPT.md)
+- **Guía operativa (CÓMO)**: [AGENTS.md](AGENTS.md)
+- **Arranque rápido**: [QUICKSTART.md](QUICKSTART.md)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Arquitectura
+
+```mermaid
+flowchart LR
+  U[Usuario\nadmin / inversor] -->|HTTP| APP[Next.js 16\npáginas + API Routes]
+  APP -->|driver nativo\nlib/db.ts| DB[(MongoDB\nbonos, órdenes, pagos)]
+  APP -->|SMTP| MAIL[MailHog\nmagic links + alertas]
+  APP -->|API S3| S3[RustFS\ndocumentos fiscales]
+  APP --> METRICS[Logs / métricas\nlatencias, tiempos BD]
+
+  style APP fill:#4a90e2
+  style DB fill:#50c878
+  style METRICS fill:#ffa500
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Instalación y arranque
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+# Servicios locales (MongoDB, MailHog, RustFS) — ver QUICKSTART.md
+npm install
+cp .env.example .env.local     # los valores por defecto funcionan en local
+npm run seed                   # emisores, bonos, carteras + índices
+npm run dev                    # http://localhost:3000
+npm test                       # 24 tests (unitarios + integración)
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Magic links visibles en [http://localhost:8025](http://localhost:8025) (MailHog).
 
-## Learn More
+## Funcionalidades
 
-To learn more about Next.js, take a look at the following resources:
+- **Admin**: estructuración de emisiones, libro de órdenes (bookbuilding), automatización de pagos (cupones + principal), cumplimiento y reportes.
+- **Inversor**: screener con filtros (rating, YTM, vencimiento, sector), tablero de posición, alertas.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Decisiones de diseño
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **Importes en céntimos y tasas en puntos básicos** (enteros): cero errores de redondeo.
+- **Los pagos programados se persisten** al adjudicar (no se calculan al vuelo): simplifica tablero y alertas.
+- **Precio de mercado derivado del modelo**: valor presente de los flujos restantes descontados a la tasa exigida por el rating del emisor (sin cotizaciones externas). La YTM del screener se obtiene por bisección.
+- **Cupón variable** = referencia simulada (`EURIBOR-SIM`, colección `rates`) + spread, fijado al adjudicar.
+- **Roles comprobados en servidor** (JWT con `jose`); `proxy.ts` (Next 16) protege las zonas `/admin` e `/investor`.
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+<!-- TODO: sección de métricas medidas bajo carga (ver PROMPT.md §5/§8) -->
+<!-- TODO: guía de deployment cuando se defina plataforma (PROMPT.md §9) -->
