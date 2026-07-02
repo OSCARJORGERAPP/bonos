@@ -1,7 +1,7 @@
-# 🎬 Guion del video de entrega — 5:00 min
+# 🎬 Guion del video de entrega — 6:30 min
 
-> Dos secuencias: **funcionamiento** (0:00–2:30) y **código** (2:30–5:00).
-> Los tiempos son orientativos por escena; ensayar una vez con cronómetro.
+> Tres secuencias: **funcionamiento** (0:00–2:30), **código** (2:30–5:00) y
+> **reflexión final** (5:00–6:30). Tiempos orientativos; ensayar con cronómetro.
 
 ## Preparación (antes de grabar)
 
@@ -76,7 +76,25 @@ Tener a mano un PDF cualquiera para la subida de documentos.
 
 ### 4:35–5:00 · CI y despliegue público (navegador: GitLab pipeline)
 - Mostrar https://gitlab.codecrypto.academy/ojrapp/bonos/-/pipelines (pipeline #1463 verde) y el repo de GitHub.
-> "El proyecto está sincronizado en **GitHub y GitLab**. El pipeline usa los templates de la academia y construye la imagen con el **Dockerfile multi-stage standalone** en el runner de Cloud Run — **en verde al primer intento, 73 segundos**. Los jobs de provisión y deploy automatizado están desactivados de forma deliberada porque la infraestructura actual de runners no los soporta — está documentado en la retrospectiva — y la app queda lista para desplegarse como un único contenedor en cualquier plataforma con Mongo gestionado, SMTP y S3. Gracias."
+> "El proyecto está sincronizado en **GitHub y GitLab**. El pipeline usa los templates de la academia y construye la imagen con el **Dockerfile multi-stage standalone** en el runner de Cloud Run — **en verde al primer intento, 73 segundos**. Los jobs de provisión y deploy automatizado están desactivados de forma deliberada porque la infraestructura actual de runners no los soporta — está documentado en la retrospectiva — y la app queda lista para desplegarse como un único contenedor en cualquier plataforma con Mongo gestionado, SMTP y S3."
+
+---
+
+## SECUENCIA 3 — Reflexión final (5:00 – 6:30)
+
+*(VS Code: `REFLEXION-FINAL.md` abierto; ir haciendo scroll por sección)*
+
+### 5:00–5:25 · Decisiones que funcionaron
+> "Cierro con lo más saliente de la reflexión final. Tres decisiones dieron el resultado esperado. **Céntimos y puntos básicos como enteros**: los tests de precisión salieron gratis, cero errores de redondeo. **Persistir los pagos al adjudicar** en vez de calcularlos al vuelo: el tablero y las alertas son una query simple — a cambio, una emisión adjudicada es inmutable, aceptable en este dominio. Y **derivar el precio del rating**: un solo modelo hace coherentes screener, cartera y alertas — el test 'un bono BBB debe rendir 4,75%' valida el sistema entero."
+
+### 5:25–5:50 · Deuda técnica asumida (scroll a §Deuda técnica)
+> "Deuda técnica, dicha honestamente: la **adjudicación no es transaccional** — los inserts van en secuencia y un fallo a mitad dejaría estado parcial; con un replica set se envolvería en `withTransaction`. Los **emails se envían síncronos** en el request — con muchos inversores haría falta una cola. Y falta la **prueba de carga** de los 50 concurrentes que fija la especificación, aunque la instrumentación para medirla ya existe."
+
+### 5:50–6:15 · Aprendizajes (scroll a §Aprendizajes)
+> "Dos aprendizajes clave. Del **dominio**: el bookbuilding se modela naturalmente como colección de órdenes más una función pura de adjudicación; y separar la tasa **contractual** del cupón de la tasa **exigida** por el mercado es lo que hace que precio y YTM cuadren. De la **técnica**: Next 16 rompe lo aprendido — `params` y `cookies` asíncronos, `proxy.ts` en vez de middleware — y leer la documentación incluida en `node_modules` evitó todos los choques. La trampa más sutil: `it.skipIf` de Vitest recibe un booleano, no una función — cuatro tests se saltaban en silencio."
+
+### 6:15–6:30 · Qué haría distinto · cierre
+> "¿Qué haría distinto? Transacciones de Mongo **desde el día uno** — retrofitearlas es más caro —, el endpoint de health y las métricas junto con la primera route, y convertir la verificación manual del flujo completo en un test de regresión permanente. En resumen: los 10 requisitos funcionales implementados, verificados y documentados, con la especificación como contrato. Gracias."
 
 ---
 
@@ -95,4 +113,8 @@ Tener a mano un PDF cualquiera para la subida de documentos.
 | 3:15 | Estructura y lib/ puro |
 | 3:45 | Tests y cobertura |
 | 4:15 | Métricas |
-| 4:35 | CI + despliegue · cierre |
+| 4:35 | CI + despliegue |
+| 5:00 | Reflexión: decisiones que funcionaron |
+| 5:25 | Reflexión: deuda técnica |
+| 5:50 | Reflexión: aprendizajes |
+| 6:15 | Qué haría distinto · cierre |
